@@ -8,7 +8,10 @@ const server = http.createServer((req, res) => {
 
   const url = req.url;
   const method = req.method;
+
+  console.log(`New request: ${req.method} ${req.url}`);
   if (url === "/") {
+    // console.log("in 0!!!");
     res.write("<html>");
     res.write("<head><title>Enter Message</title></head>");
     res.write(
@@ -25,19 +28,25 @@ const server = http.createServer((req, res) => {
       body.push(chunk);
     });
 
-    req.on("end", () => {
+    // console.log("in 1!!!");
+
+    return req.on("end", () => {
+      // console.log("in 2!!!");
       const parsedBody = Buffer.concat(body).toString();
       // console.log(parsedBody);
       const message = parsedBody.split("=")[1];
       // console.log(message);
 
-      fs.writeFileSync("message.txt", message);
+      fs.writeFile("message.txt", message, (err) => {
+        res.statusCode = 302;
+        res.setHeader("Location", "/");
+        return res.end();
+      });
+      // console.log("end!!!");
     });
-
-    res.statusCode = 302;
-    res.setHeader("Location", "/");
-    return res.end();
   }
+
+  // console.log("out!!!");
 
   res.setHeader("Content-Type", "text/html");
   res.write("<html>");
