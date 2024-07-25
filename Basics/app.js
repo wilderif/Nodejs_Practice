@@ -2,9 +2,9 @@ const http = require("http");
 const fs = require("fs");
 
 const server = http.createServer((req, res) => {
-  console.log(req.url);
-  console.log(req.method);
-  console.log(req.headers);
+  // console.log(req.url);
+  // console.log(req.method);
+  // console.log(req.headers);
 
   const url = req.url;
   const method = req.method;
@@ -19,7 +19,21 @@ const server = http.createServer((req, res) => {
   }
 
   if (url === "/message" && method === "POST") {
-    fs.writeFileSync("message.txt", "DUMMY");
+    const body = [];
+    req.on("data", (chunk) => {
+      // console.log(chunk);
+      body.push(chunk);
+    });
+
+    req.on("end", () => {
+      const parsedBody = Buffer.concat(body).toString();
+      // console.log(parsedBody);
+      const message = parsedBody.split("=")[1];
+      // console.log(message);
+
+      fs.writeFileSync("message.txt", message);
+    });
+
     res.statusCode = 302;
     res.setHeader("Location", "/");
     return res.end();
