@@ -52,6 +52,6 @@ const requestHandler = (req, res) => {
 };
 
 // module.exports = { requestHandler };
-module.exports.hadler = requestHandler;
+module.exports.handler = requestHandler;
 
 console.log("test nodemon restart");
