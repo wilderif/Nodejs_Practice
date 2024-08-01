@@ -7,19 +7,27 @@ const filePath = path.join(
   "products.json"
 );
 
+const getProductFromFile = (cb) => {
+  fs.readFile(filePath, (err, fileContent) => {
+    if (err) {
+      cb([]);
+    } else {
+      try {
+        cb(JSON.parse(fileContent));
+      } catch (err) {
+        cb([]);
+      }
+    }
+  });
+};
+
 module.exports = class Product {
   constructor(title) {
     this.title = title;
   }
 
   save() {
-    fs.readFile(filePath, (err, fileContent) => {
-      let products = [];
-      if (!err) {
-        try {
-          products = JSON.parse(fileContent);
-        } catch (err) {}
-      }
+    getProductFromFile((products) => {
       products.push(this);
       fs.writeFile(filePath, JSON.stringify(products), (err) => {
         console.log(err);
@@ -28,16 +36,6 @@ module.exports = class Product {
   }
 
   static fetchAll(cb) {
-    fs.readFile(filePath, (err, fileContent) => {
-      if (err) {
-        cb([]);
-      } else {
-        try {
-          cb(JSON.parse(fileContent));
-        } catch (err) {
-          cb([]);
-        }
-      }
-    });
+    getProductFromFile(cb);
   }
 };
